@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>然然文书查重</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body background="./assets/images/diana_celebrate.jpg">
+    <div id="app" class="demo">
+        <form @submit.prevent="handleSubmit">
+            <div class="content-input-wrapper">
+                <textarea class="content-input" id="content" v-model="content" :placeholder="placeholder"></textarea>
+            </div>
+            <div class="button-wrapper">
+                <button class="button" type="submit">查 重</button>
+            </div>
+        </form>
+    </div>
+    </div>
+
+    <script src="./main.js"></script>
+</body>
+
+</html>
