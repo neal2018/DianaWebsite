@@ -7,90 +7,97 @@ from tkinter import *
 import numpy as np
 import jieba
 import re
+import aiohttp
+import asyncio
 
+class Checker:
+    def __init__(self):
+        self.session = aiohttp.ClientSession()
 
-def paper_check(paper: str):
-    paper_cut = cut_text(paper.strip(), 20)
-    similarity_rates = [check_words(search_text) for search_text in paper_cut]
-    return similarity_rates
+    async def paper_check(self, paper: str):
+        paper_cut = self.cut_text(paper.strip(), 20)
+        tasks = [self.check_words(search_text) for search_text in paper_cut]
+        similarity_rates = await asyncio.gather(*tasks)
+        return similarity_rates
 
+    def close_session(self):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.session.close())
 
-def check_words(search_text):
-    html = get_html(f"http://www.baidu.com/s?wd={search_text}&cl=3")
-    et_html = etree.HTML(html)
-    match_texts = et_html.xpath("//*[@id]/div[1]/em")
-    urls = et_html.xpath('//*[@id]/h3/a/@href')
-    match_texts = {}  # word pieces: url
+    async def check_words(self, search_text):
+        html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}&cl=3", self.session)
+        et_html = etree.HTML(html)
+        urls = et_html.xpath('//*[@id]/h3/a/@href')
+        match_texts = {}  # word pieces: url
 
-    # urls = [requests.get(url).url for url in urls]
-    for i, url in enumerate(urls):
-        matchs = et_html.xpath(f'//*[@id="{i+1}"]/div[1]/em')
-        for m in matchs:
-            if m.text not in match_texts:
-                match_texts[m.text] = url
-    ems = [m_txt for m_txt in match_texts]
-    ems=[]
-    if ems:
-        max_index, max_value = get_similarity_rate(ems, search_text)
-        return {"words": search_text, "url": match_texts[ems[max_index]], "rate": f"{max_value:.3f}"}
-    else:
-        return {"words": search_text, "url": "No Pair", "rate": "0.00"}
+        # urls = [requests.get(url).url for url in urls]
+        for i, url in enumerate(urls):
+            matchs = et_html.xpath(f'//*[@id="{i+1}"]/div[1]/em')
+            for m in matchs:
+                if m.text not in match_texts:
+                    match_texts[m.text] = url
 
-
-def cut_text(text: str, length: int) -> List[str]:
-    seg_list = jieba.cut(text.replace("\n", ""))
-    res = []
-    current = []
-    stop_words = {",", ".", "，", "。"}
-    for word in seg_list:
-        if len(current) + len(word) > length:
-            res.append("".join(current).strip())
-            current = [word]
-        elif word in stop_words and len(current) > length*0.8:
-            res.append("".join(current).strip())
-            current = []
+        ems = [m_txt for m_txt in match_texts]
+        if ems:
+            max_index, max_value = self.get_similarity_rate(ems, search_text)
+            return {"words": search_text, "url": match_texts[ems[max_index]], "rate": f"{max_value:.3f}"}
         else:
-            current.append(word)
-    if current:
-        res.append("".join(current))
-    return res
+            return {"words": search_text, "url": "No Pair", "rate": "0.00"}
 
+    @staticmethod
+    def cut_text(text: str, length: int) -> List[str]:
+        seg_list = jieba.cut(text.replace("\n", ""))
+        res = []
+        current = []
+        stop_words = {",", ".", "，", "。"}
+        for word in seg_list:
+            if len(current) + len(word) > length:
+                res.append("".join(current).strip())
+                current = [word]
+            elif word in stop_words and len(current) > length*0.8:
+                res.append("".join(current).strip())
+                current = []
+            else:
+                current.append(word)
+        if current:
+            res.append("".join(current))
+        return res
 
-def get_html(url: str) -> str:
-    url_cleaned = quote(url, safe=";/?:@&=+$,", encoding="utf-8")
-    res = urlopen(url_cleaned)
-    html = res.read().decode('utf-8')
-    return html
+    @staticmethod
+    async def get_html(url: str, session: aiohttp.ClientSession) -> str:
+        url_cleaned = quote(url, safe=";/?:@&=+$,", encoding="utf-8")
+        async with session.get(url_cleaned) as respond:
+            return await respond.text()
 
+    @staticmethod
+    def get_similarity_rate(all_doc: List[str], doc_test: str) -> List[float]:
+        bad_word = '[,.＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､\u3000、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？｡。''＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､\u3000、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？]+'
+        doc_test_cleaned = re.sub(bad_word, "", doc_test)
+        all_doc_cleaned = [re.sub(bad_word, "", doc) for doc in all_doc]
 
-def get_similarity_rate(all_doc: List[str], doc_test: str) -> List[float]:
-    bad_word = '[,.＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､\u3000、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？｡。''＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､\u3000、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？｡。]+'
-    doc_test_cleaned = re.sub(bad_word, "", doc_test)
-    all_doc_cleaned = [re.sub(bad_word, "", doc) for doc in all_doc]
+        if not doc_test_cleaned or not all_doc_cleaned:
+            return [0, 0]
 
-    if not doc_test_cleaned or not all_doc_cleaned:
-        return [0, 0]
+        all_doc_list = [[word for word in jieba.cut(
+            doc)] for doc in all_doc_cleaned]
+        doc_test_list = [word for word in jieba.cut(doc_test_cleaned)]
 
-    all_doc_list = [[word for word in jieba.cut(
-        doc)] for doc in all_doc_cleaned]
-    doc_test_list = [word for word in jieba.cut(doc_test_cleaned)]
+        dictionary = corpora.Dictionary([doc_test_list])
 
-    dictionary = corpora.Dictionary([doc_test_list])
+        corpus = [dictionary.doc2bow(doc) for doc in all_doc_list]
+        doc_test_vec = dictionary.doc2bow(doc_test_list)
 
-    corpus = [dictionary.doc2bow(doc) for doc in all_doc_list]
-    doc_test_vec = dictionary.doc2bow(doc_test_list)
+        model = models.TfidfModel(corpus)
 
-    model = models.TfidfModel(corpus)
+        index = similarities.SparseMatrixSimilarity(
+            model[corpus], num_features=len(dictionary.keys()))
 
-    index = similarities.SparseMatrixSimilarity(
-        model[corpus], num_features=len(dictionary.keys()))
+        sim = index[model[doc_test_vec]]
 
-    sim = index[model[doc_test_vec]]
+        max_index = np.argmax(sim)
+        max_value = sim[max_index]
 
-    max_index = np.argmax(sim)
-    max_value = sim[max_index]
-
-    return [max_index, max_value]
+        return [max_index, max_value]
 
 
 if __name__ == "__main__":
@@ -112,5 +119,7 @@ if __name__ == "__main__":
 我摘起一朵向日葵捧到嘉然小姐面前，让意识消失在温暖的阳光里。
 运营小姐会懂的，虽然我没有说话。
 因为向日葵的花语，是沉默的爱呀"""
-    k = paper_check(a)
+    c=Checker()
+    k = c.paper_check(a)
     print(k)
+    c.close_session()

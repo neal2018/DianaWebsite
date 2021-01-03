@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from utils import paper_check
+from utils import Checker
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 import jieba
 
 app = FastAPI()
+check = Checker()
 
 origins = ["http://127.0.0.1:5500"]
 
@@ -21,7 +22,7 @@ class Data(BaseModel):
 
 @app.post("/check")
 async def root(request: Data):
-    similarity_rates = paper_check(request.content)
+    similarity_rates = await check.paper_check(request.content)
     return similarity_rates
 
 if __name__ == "__main__":
