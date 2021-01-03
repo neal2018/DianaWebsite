@@ -7,6 +7,7 @@
     <title>然然文书查重</title>
     <link rel="stylesheet" href="./assets/styles.css">
     <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body background="./assets/images/diana_celebrate.jpg">
@@ -16,10 +17,23 @@
                 <textarea class="content-input" id="content" v-model="content" :placeholder="placeholder"></textarea>
             </div>
             <div class="button-wrapper">
-                <button class="button" type="submit">查 重</button>
+                <button class="button" type="submit" :disabled='isDisable'>查 重</button>
             </div>
         </form>
-    </div>
+        <div v-if="isError">
+            Please retry
+        </div>
+        <div v-else-if="isSendRequest && !isGetResponse">
+            Getting result...
+        </div>
+        <div v-else-if="isSendRequest && isGetResponse">
+            <li v-for="temp in answer">
+                {{ temp.words }}
+                {{ temp.url }}
+                {{ temp.rate }}
+            </li>
+            <!-- TODO: add css -->
+        </div>
     </div>
 
     <script src="./main.js"></script>

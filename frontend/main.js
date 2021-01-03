@@ -3,43 +3,48 @@ const app = {
         return {
             message: 'Hello Vue!!',
             diana_celebrate: './assets/images/diana_celebrate.jpg',
-            answer: '',
-            content: ''
+            content: '',
+            answer: null,
+            isSendRequest: false,
+            isGetResponse: false,
+            isError: false
         }
     },
     methods: {
-        addToCart() {
-            this.cart += 1
-        },
         async handleSubmit(e) {
             e.preventDefault()
+            this.isSendRequest = true
+            this.isGetResponse = false
 
             if (this.content === '') {
                 this.content = this.placeholder
             }
 
-            var params = new Object();
-            params.content = this.content
-            console.log(params)
-            var httpRequest = new XMLHttpRequest();
-            httpRequest.open('POST', 'http://127.0.0.1:8000/check', true);
-            httpRequest.send(JSON.stringify({
-                content: this.content
-            }));
+            try {
+                response = await axios.post('http://127.0.0.1:8000/check', {
+                    content: this.content
+                })
 
-            httpRequest.onreadystatechange = function () {
-                if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-                    var json = httpRequest.responseText;
-                    console.log(json);
+                if (response.status == 200) {
+                    this.answer = response.data
+                    this.isGetResponse = true
+                    console.log(this.answer)
+                } else {
+                    this.isError = true
                 }
-            };
-
-            console.log(this.answer)
+            }
+            catch (err) {
+                this.isError = true
+                console.log("NOOOOOO")
+            }
         }
     },
     computed: {
         title() {
             return this.brand + ' ' + this.message
+        },
+        isDisable() {
+            return this.isSendRequest && !this.isGetResponse && !this.isError
         },
         placeholder() {
             return `这个冬天真冷，窗外的大雪飞扬，像是要吹灭街上的光。但是看着嘉然跳跳唱唱，处刑大家的小作文，再被写给晚晚的小作文处刑，我觉得有股热流在身体里流淌，紧绷的立毛肌都舒展开来了。

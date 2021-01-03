@@ -15,7 +15,7 @@ class Checker:
         self.session = aiohttp.ClientSession()
 
     async def paper_check(self, paper: str):
-        paper_cut = self.cut_text(paper.strip(), 20)
+        paper_cut = self.cut_text(paper.strip(), 25)
         tasks = [self.check_words(search_text) for search_text in paper_cut]
         similarity_rates = await asyncio.gather(*tasks)
         return similarity_rates
@@ -28,21 +28,29 @@ class Checker:
         html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}&cl=3", self.session)
         et_html = etree.HTML(html)
         urls = et_html.xpath('//*[@id]/h3/a/@href')
+        tasks = [self.fetch(url, self.session) for url in urls]
+        urls = await asyncio.gather(*tasks)
         match_texts = {}  # word pieces: url
 
-        # urls = [requests.get(url).url for url in urls]
         for i, url in enumerate(urls):
             matchs = et_html.xpath(f'//*[@id="{i+1}"]/div[1]/em')
             for m in matchs:
                 if m.text not in match_texts:
                     match_texts[m.text] = url
-
         ems = [m_txt for m_txt in match_texts]
         if ems:
             max_index, max_value = self.get_similarity_rate(ems, search_text)
             return {"words": search_text, "url": match_texts[ems[max_index]], "rate": f"{max_value:.3f}"}
         else:
             return {"words": search_text, "url": "No Pair", "rate": "0.00"}
+
+    @staticmethod
+    async def fetch(url, session):
+        try:
+            async with session.get(url, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=0.5)) as response:
+                return str(response.real_url)
+        except:
+            return url
 
     @staticmethod
     def cut_text(text: str, length: int) -> List[str]:
