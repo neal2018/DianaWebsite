@@ -5,3 +5,4 @@ jieba==0.42.1
 lxml
 pydantic==1.7.3
 starlette==0.13.6
+uvicorn

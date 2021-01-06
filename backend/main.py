@@ -7,7 +7,7 @@ import jieba
 app = FastAPI()
 check = Checker()
 
-origins = ["http://127.0.0.1:5500"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware, 
@@ -28,4 +28,4 @@ async def root(request: Data):
 if __name__ == "__main__":
     import uvicorn
     jieba.initialize()
-    uvicorn.run(app='main:app', host="127.0.0.1", port=8000, reload=True, debug=True)
+    uvicorn.run(app='main:app', host="0.0.0.0", port=8888, reload=True, debug=True)
