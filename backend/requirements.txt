@@ -1,0 +1,7 @@
+aiohttp
+fastapi==0.63.0
+gensim==3.8.0
+jieba==0.42.1
+lxml
+pydantic==1.7.3
+starlette==0.13.6

@@ -3,7 +3,6 @@ from urllib.request import urlopen
 from urllib.parse import quote
 from typing import List
 from lxml import etree
-from tkinter import *
 import numpy as np
 import jieba
 import re

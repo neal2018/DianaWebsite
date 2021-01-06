@@ -22,7 +22,7 @@ const app = {
             }
 
             try {
-                let response = await axios.post('http://127.0.0.1:8000/check', {
+                let response = await axios.post('http://118.25.75.14:8000/check', {
                     content: this.content
                 })
 
