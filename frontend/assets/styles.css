@@ -1,11 +1,18 @@
-.demo {
-  font-family: sans-serif;
-  border-radius: 2px;
-  padding: 20px 30px;
-  margin-top: 100px;
-  margin-bottom: 40px;
-  user-select: none;
-  overflow-x: auto;
+body {
+  margin: 0;
+  font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+}
+
+.github-button {
+  float: right;
+  margin: 5px 0;
+  width: 120px;
+  height: 30px;
+  border-style: none;
+}
+
+.form-wrapper {
+  padding: 100px 0px 0px 0px;
 }
 
 .button-wrapper {
@@ -17,7 +24,6 @@
   background-color: #b95e63;
   border-radius: 10px;
   font-size: 30px;
-  font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
   width: 160px;
   height: 60px;
   color: #fde4dd;
@@ -28,29 +34,84 @@
   cursor: pointer;
 }
 
+.button:disabled {
+  background-color: #fff;
+  cursor: not-allowed;
+}
+
 .content-input-wrapper {
-  padding: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 30px 0;
 }
 
 .content-input {
+  display: block;
   font-size: 20px;
-  font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
   width: 75%;
   height: 500px;
-  letter-spacing: 1px;
+  margin: 0px auto;
   padding: 10px;
+  letter-spacing: 1px;
   line-height: 1.5;
   border-radius: 5px;
   border: 1px solid #ccc;
-  background-color:rgba(255,255,255,0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   box-shadow: 1px 1px 1px #999;
   outline: none;
   overflow: auto;
 }
 
-.product-image {
+.text-wrapper {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  background-color: rgba(185, 154, 134, 0.6);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  height: 100px;
   width: 50%;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.result-report,
+.result-table {
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4);
+  margin: 50px auto 100px auto;
+  border: 1px solid #ccc;
+  width: 75%;
+}
+
+.result-report {
+  width: 75%;
+  font-size: 20px;
+  text-align: center;
+}
+
+.result-table {
+  font-size: 18px;
+  border-collapse: collapse;
+}
+
+.result-table th {
+  font-size: 22px;
+  padding: 10px;
+}
+
+.td-words {
+  width: 50%;
+  border-top: 1px solid rgb(14, 13, 13);
+  padding: 10px;
+}
+
+.td-rate,
+.td-link {
+  width: 10%;
+  text-align: center;
+  border-top: 1px solid rgb(14, 13, 13);
+  padding: 10px;
+}
+
+.td-link {
+  width: 15%;
 }

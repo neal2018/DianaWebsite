@@ -13,6 +13,7 @@ const app = {
     methods: {
         async handleSubmit(e) {
             e.preventDefault()
+            this.isError = false
             this.isSendRequest = true
             this.isGetResponse = false
 
@@ -21,7 +22,7 @@ const app = {
             }
 
             try {
-                response = await axios.post('http://127.0.0.1:8000/check', {
+                let response = await axios.post('http://127.0.0.1:8000/check', {
                     content: this.content
                 })
 
@@ -35,7 +36,6 @@ const app = {
             }
             catch (err) {
                 this.isError = true
-                console.log("NOOOOOO")
             }
         }
     },
@@ -45,6 +45,17 @@ const app = {
         },
         isDisable() {
             return this.isSendRequest && !this.isGetResponse && !this.isError
+        },
+        avgRate() {
+            if (this.answer === null) {
+                return 0;
+            }
+            const total = this.answer.reduce(function (sum, object) {
+                return sum + parseFloat(object.rate);
+            }, 0);
+            console.log(total)
+            return (total / this.answer.length).toFixed(3);
+
         },
         placeholder() {
             return `这个冬天真冷，窗外的大雪飞扬，像是要吹灭街上的光。但是看着嘉然跳跳唱唱，处刑大家的小作文，再被写给晚晚的小作文处刑，我觉得有股热流在身体里流淌，紧绷的立毛肌都舒展开来了。
