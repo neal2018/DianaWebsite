@@ -10,7 +10,7 @@ DEBUG = False
 app = FastAPI()
 check = Checker()
 
-origins = ["https://neal2018.github.io/DianaWebsite/"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
