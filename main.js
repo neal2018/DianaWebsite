@@ -25,6 +25,7 @@ const app = {
             }
             if (this.content.length > this.maxLength) {
                 this.isTooLong = true
+                this.isGetResponse = true
                 return
             }
 

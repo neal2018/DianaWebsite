@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+  font-family: "Microsoft YaHei", "Heiti SC", "黑体", "Arial", sans-serif;
 }
 
 .github-button {
@@ -60,15 +60,12 @@ body {
   overflow: auto;
 }
 
-.content-input::-webkit-input-placeholder {
-  content: "这个冬天真冷，窗外的大雪飞扬，像是要吹灭街上的光。但是看着嘉然跳跳唱唱，处刑大家的小作文，再被写给晚晚的小作文处刑，我觉得有股热流在身体里流淌，紧绷的立毛肌都舒展开来了。\A\A当初在嘉然出现时，有人警告说雪崩时没有一片雪花是无辜的。但我现在想如果是落到嘉然的怀里，再冷的雪也会融化的吧。\A\A可是我没有落到她的怀里，而是落到她的手心了。\A\A我对然然的表演傻笑，旁边脸被冻得发红的妹妹问我，还有哪个冬天比这个更冷吗？\A\A我突然很害怕。我知道，没有嘉然的冬天才是最冷的。\A\A更让人难过的是我没有妹妹，但这个冬天迟早会来。";
-}
-
 .text-wrapper {
   font-size: 25px;
   font-weight: bold;
   text-align: center;
   background-color: rgba(185, 154, 134, 0.6);
+  color: rgba(45, 45, 45, 0.9);
   border: 1px solid #ccc;
   border-radius: 10px;
   height: 100px;
@@ -81,6 +78,7 @@ body {
 .result-table {
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4);
+  color: rgba(45, 45, 45, 0.9);
   margin: 50px auto 100px auto;
   border: 1px solid #ccc;
   width: 75%;
