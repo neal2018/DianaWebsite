@@ -1,24 +1,28 @@
+from logging import DEBUG
 from fastapi import FastAPI
 from utils import Checker
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 import jieba
 
+DEBUG = False
+
 app = FastAPI()
 check = Checker()
 
-origins = ["*"]
+origins = ["https://neal2018.github.io/DianaWebsite/"]
 
 app.add_middleware(
-    CORSMiddleware, 
-    allow_origins=origins,  #设置允许的origins来源
+    CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # 设置允许跨域的http方法，比如 get、post、put等。
-    allow_headers=["*"])  #允许跨域的headers，可以用来鉴别来源等作用。
+    allow_methods=["*"],
+    allow_headers=["*"])
 
 
 class Data(BaseModel):
     content: str
+
 
 @app.post("/check")
 async def root(request: Data):
@@ -28,4 +32,11 @@ async def root(request: Data):
 if __name__ == "__main__":
     import uvicorn
     jieba.initialize()
-    uvicorn.run(app='main:app', host="0.0.0.0", port=8888, reload=True, debug=True)
+    if not DEBUG:
+        key = "../../ssl/key.key"
+        crt = "../../ssl/crt.crt"
+        uvicorn.run(app='main:app', host="0.0.0.0", port=8888,
+                    ssl_keyfile=key, ssl_certfile=crt, reload=True, debug=False)
+    else:
+        uvicorn.run(app='main:app', host="0.0.0.0",
+                    port=8888, reload=True, debug=True)

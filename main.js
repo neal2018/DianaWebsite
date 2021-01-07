@@ -7,7 +7,9 @@ const app = {
             answer: null,
             isSendRequest: false,
             isGetResponse: false,
-            isError: false
+            isError: false,
+            isTooLong: false,
+            maxLength: 500
         }
     },
     methods: {
@@ -16,9 +18,14 @@ const app = {
             this.isError = false
             this.isSendRequest = true
             this.isGetResponse = false
+            this.isTooLong = false
 
             if (this.content === '') {
                 this.content = this.placeholder
+            }
+            if (this.content.length > this.maxLength) {
+                this.isTooLong = true
+                return
             }
 
             try {
@@ -74,4 +81,3 @@ const app = {
 }
 
 Vue.createApp(app).mount('#app')
-console.log("aaa")

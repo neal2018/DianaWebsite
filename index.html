@@ -34,10 +34,16 @@
         <div v-if="isError" class="text-wrapper">
             <p>网络错误，请重试</p>
         </div>
+
+        <div v-else-if="isTooLong" class="text-wrapper">
+            <p>太长了！目前只支持{{maxLength}}字以下</p>
+        </div>
+
         <div v-else-if="isSendRequest && !isGetResponse" class="text-wrapper">
             <p>查重中</p>
         </div>
-        <div v-else-if="isSendRequest && isGetResponse" class="table-wrapper">
+
+        <div v-else-if="isSendRequest && isGetResponse">
             <div class="result-report">
                 <p>平均匹配率为 {{avgRate}}</p>
                 <p v-if="avgRate<=0.5">大概率是原创</p>
@@ -62,6 +68,7 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 
 </body>
