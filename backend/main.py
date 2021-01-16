@@ -1,6 +1,6 @@
 from logging import DEBUG
-from fastapi import FastAPI
-from utils import Checker
+from fastapi import FastAPI, BackgroundTasks
+from utils import Checker, write_log
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 import jieba
@@ -25,8 +25,9 @@ class Data(BaseModel):
 
 
 @app.post("/check")
-async def root(request: Data):
+async def root(request: Data, background_tasks: BackgroundTasks):
     similarity_rates = await check.paper_check(request.content)
+    background_tasks.add_task(write_log, request.content)
     return similarity_rates
 
 if __name__ == "__main__":

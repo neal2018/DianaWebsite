@@ -47,9 +47,6 @@ const app = {
         }
     },
     computed: {
-        title() {
-            return this.brand + ' ' + this.message
-        },
         isDisable() {
             return this.isSendRequest && !this.isGetResponse && !this.isError
         },

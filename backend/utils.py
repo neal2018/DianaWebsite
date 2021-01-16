@@ -8,6 +8,7 @@ import jieba
 import re
 import aiohttp
 import asyncio
+import time
 
 
 class Checker:
@@ -112,6 +113,10 @@ class Checker:
         max_value = sim[max_index]
 
         return [max_index, max_value]
+
+def write_log(message: str, filename="../../DianaLog/log.txt"):
+    with open(filename, mode="a", encoding="utf-8") as log:
+        log.write(f"[INFO]{time.strftime('%Y-%m-%H-%M')} {message}\n\n")
 
 
 if __name__ == "__main__":

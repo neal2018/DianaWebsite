@@ -46,7 +46,7 @@
         <div v-else-if="isSendRequest && isGetResponse">
             <div class="result-report">
                 <p>平均匹配率为 {{avgRate}}</p>
-                <p v-if="avgRate<=0.5">大概率是原创</p>
+                <p v-if="avgRate<=0.55">大概率是原创</p>
                 <p v-else>大概率是偷的</p>
             </div>
             <table class="result-table">
