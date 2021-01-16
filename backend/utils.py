@@ -1,7 +1,7 @@
 from gensim import corpora, models, similarities
 from urllib.request import urlopen
 from urllib.parse import quote
-from typing import List
+from typing import List, Dict, Tuple
 from lxml import etree
 import numpy as np
 import jieba
@@ -9,21 +9,21 @@ import re
 import aiohttp
 import asyncio
 
+
 class Checker:
     def __init__(self):
         self.session = aiohttp.ClientSession()
 
-    async def paper_check(self, paper: str):
-        paper_cut = self.cut_text(paper.strip(), 25)
+    async def paper_check(self, paper: str) -> Tuple[Dict[str, str]]:
+        paper_cut = self.cut_text(paper.strip(), 35)
         tasks = [self.check_words(search_text) for search_text in paper_cut]
         similarity_rates = await asyncio.gather(*tasks)
         return similarity_rates
 
-    def close_session(self):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.session.close())
+    async def close_session(self):
+        await self.session.close()
 
-    async def check_words(self, search_text):
+    async def check_words(self, search_text: str) -> Dict[str, str]:
         html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}&cl=3", self.session)
         et_html = etree.HTML(html)
         urls = et_html.xpath('//*[@id]/h3/a/@href')
@@ -44,7 +44,7 @@ class Checker:
             return {"words": search_text, "url": "No Pair", "rate": "0.00"}
 
     @staticmethod
-    async def fetch(url, session):
+    async def fetch(url, session: aiohttp.ClientSession) -> str:
         try:
             async with session.get(url, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=0.5)) as response:
                 return str(response.real_url)
@@ -57,15 +57,22 @@ class Checker:
         res = []
         current = []
         stop_words = {",", ".", "，", "。"}
+        current_len = 0
         for word in seg_list:
-            if len(current) + len(word) > length:
-                res.append("".join(current).strip())
-                current = [word]
-            elif word in stop_words and len(current) > length*0.8:
+            word_len = len(word)
+            # cut the text into length size piece,
+            # and try keeping the whole sentence
+            if word in stop_words and current_len > length*0.8:
                 res.append("".join(current).strip())
                 current = []
+                current_len = 0
+            elif current_len + word_len > length:
+                res.append("".join(current).strip())
+                current = [word]
+                current_len = word_len
             else:
                 current.append(word)
+                current_len += word_len
         if current:
             res.append("".join(current))
         return res
@@ -108,7 +115,7 @@ class Checker:
 
 
 if __name__ == "__main__":
-    a = """我想见到太阳。
+    test_word = """我想见到太阳。
 从出生起，我就生活在永夜里，向上是吞没视线的漆黑，望远是遥不可及的幽邃。好在每个嘉人们点起微光，才逐渐编织出暖黄的光网。
 但是运营小姐说，她见过太阳。
 她说在有太阳的地方，白天到处都是亮的，露珠闪闪发光，向日葵田把整个视界染成明黄色，暖和的风带着好闻的味道，嘉人们都不用挤在角落取暖。
@@ -126,7 +133,12 @@ if __name__ == "__main__":
 我摘起一朵向日葵捧到嘉然小姐面前，让意识消失在温暖的阳光里。
 运营小姐会懂的，虽然我没有说话。
 因为向日葵的花语，是沉默的爱呀"""
-    c=Checker()
-    k = c.paper_check(a)
-    print(k)
-    c.close_session()
+
+    async def test():
+        checker = Checker()
+        result = await checker.paper_check(test_word)
+        print(result)
+        await checker.close_session()
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test())

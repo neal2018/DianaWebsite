@@ -1,7 +1,6 @@
 const app = {
     data() {
         return {
-            message: 'Hello Vue!!',
             diana_celebrate: './assets/images/diana_celebrate.jpg',
             content: '',
             answer: null,
@@ -58,11 +57,13 @@ const app = {
             if (this.answer === null) {
                 return 0;
             }
-            const total = this.answer.reduce(function (sum, object) {
-                return sum + parseFloat(object.rate);
+            const totalWeightedRate = this.answer.reduce(function (sum, object) {
+                return sum + parseFloat(object.rate)*parseFloat(object.words.length);
             }, 0);
-            console.log(total)
-            return (total / this.answer.length).toFixed(3);
+            const totalLength = this.answer.reduce(function (sum, object) {
+                return sum + parseFloat(object.words.length);
+            }, 0);
+            return (totalWeightedRate / totalLength).toFixed(3);
 
         },
         placeholder() {
