@@ -116,7 +116,7 @@ class Checker:
 
 def write_log(message: str, filename="../../DianaLog/log.txt"):
     with open(filename, mode="a", encoding="utf-8") as log:
-        log.write(f"[INFO]{time.strftime('%Y-%m-%H-%M')} {message}\n\n")
+        log.write(f"[INFO]{time.strftime(r'%Y-%m-%d-%H-%M')} {message}\n\n")
 
 
 if __name__ == "__main__":
