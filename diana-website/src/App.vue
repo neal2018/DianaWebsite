@@ -59,7 +59,7 @@ const handleSubmit = async (e: Event) => {
   isGetResponse = false
   isTooLong = false
 
-  if (content === '') {
+  if (content === "") {
     content = placeholder
   }
   if (content.length > maxLength) {
@@ -68,8 +68,8 @@ const handleSubmit = async (e: Event) => {
     return
   }
   try {
-    let response = await fetch('https://118.25.75.14:8888/check', {
-      method: 'POST',
+    let response = await fetch("https://118.25.75.14:8888/check", {
+      method: "POST",
       body: JSON.stringify({ "content": content })
     })
 
@@ -89,7 +89,7 @@ const handleSubmit = async (e: Event) => {
 
 <style>
 body {
-  background-image: url("./src/assets/diana_celebrate.jpg");
+  background-image: url("./assets/diana_celebrate.jpg");
   margin: 0;
   font-family: "Microsoft YaHei", "Heiti SC", "黑体", "Arial", sans-serif;
 }
