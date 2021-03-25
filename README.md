@@ -2,7 +2,7 @@
 
 address: http://jiarangachi.icu (or https://neal2018.github.io/DianaWebsite/)
 
-frontend: vue
+frontend: vue3 + vite + typescript
 
 backend: fastapi
 
