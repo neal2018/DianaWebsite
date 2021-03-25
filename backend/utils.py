@@ -1,5 +1,4 @@
 from gensim import corpora, models, similarities
-from urllib.request import urlopen
 from urllib.parse import quote
 from typing import List, Dict, Tuple
 from lxml import etree
@@ -25,11 +24,9 @@ class Checker:
         await self.session.close()
 
     async def check_words(self, search_text: str) -> Dict[str, str]:
-        html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}&cl=3", self.session)
+        html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}", self.session)
         et_html = etree.HTML(html)
         urls = et_html.xpath('//*[@id]/h3/a/@href')
-        tasks = [self.fetch(url, self.session) for url in urls]
-        urls = await asyncio.gather(*tasks)
         match_texts = {}  # word pieces: url
 
         for i, url in enumerate(urls):
@@ -49,7 +46,7 @@ class Checker:
         try:
             async with session.get(url, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=0.5)) as response:
                 return str(response.real_url)
-        except:
+        except BaseException:
             return url
 
     @staticmethod
@@ -63,7 +60,7 @@ class Checker:
             word_len = len(word)
             # cut the text into length size piece,
             # and try keeping the whole sentence
-            if word in stop_words and current_len > length*0.8:
+            if word in stop_words and current_len > length * 0.8:
                 res.append("".join(current).strip())
                 current = []
                 current_len = 0
@@ -80,8 +77,15 @@ class Checker:
 
     @staticmethod
     async def get_html(url: str, session: aiohttp.ClientSession) -> str:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'zh-CN,zh;q=0.9',
+            'Connection': 'Keep-Alive',
+            'sec-ch-ua': '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"'}
         url_cleaned = quote(url, safe=";/?:@&=+$,", encoding="utf-8")
-        async with session.get(url_cleaned) as respond:
+        async with session.get(url_cleaned, headers=headers) as respond:
             return await respond.text()
 
     @staticmethod
@@ -114,6 +118,7 @@ class Checker:
 
         return [max_index, max_value]
 
+
 def write_log(message: str, filename="../../DianaLog/log.txt"):
     with open(filename, mode="a", encoding="utf-8") as log:
         log.write(f"[INFO]{time.strftime(r'%Y-%m-%d-%H-%M')} {message}\n\n")
@@ -142,7 +147,7 @@ if __name__ == "__main__":
     async def test():
         checker = Checker()
         result = await checker.paper_check(test_word)
-        print(result)
+        [print(l) for l in result]
         await checker.close_session()
 
     loop = asyncio.get_event_loop()
