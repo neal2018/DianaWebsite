@@ -11,3 +11,8 @@ TODO:
 - [ ] Generate articles
 - [ ] Rate articles
 - [ ] Add proxy pool
+
+Other projects:
+
+- http://watermelon.jiarangachi.icu
+- http://aqua.jiarangachi.icu
