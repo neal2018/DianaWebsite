@@ -24,7 +24,7 @@ class Checker:
         await self.session.close()
 
     async def check_words(self, search_text: str) -> Dict[str, str]:
-        html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}", self.session)
+        html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}&usm=3&rsv_idx=2&rsv_page=1", self.session)
         
         counter = 0
         while "百度安全验证" in html: # try again
@@ -92,7 +92,8 @@ class Checker:
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Connection': 'Keep-Alive',
-            'sec-ch-ua': '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"'}
+            'sec-ch-ua': '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"',
+            'Referer':'https://www.baidu.com',}
         url_cleaned = quote(url, safe=";/?:@&=+$,", encoding="utf-8")
         async with session.get(url_cleaned, headers=headers) as respond:
             return await respond.text()

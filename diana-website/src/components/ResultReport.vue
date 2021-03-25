@@ -1,7 +1,8 @@
 <template>
   <div class="result-report">
     <p>平均匹配率为 {{ avgRate }}</p>
-    <p v-if="avgRate <= 0.55">重复率比较低，再接再厉！</p>
+    <p v-if="successRate <= 0.2">好像服务器网络不太好...可以等待几分钟后重试！</p>
+    <p v-else-if="avgRate <= 0.55">重复率比较低，再接再厉！</p>
     <p v-else>重复率有点高，要加油噢！</p>
   </div>
   <table class="result-table">
@@ -38,9 +39,11 @@ interface Answer {
   url: string,
   rate: string
 }
+
 const props = defineProps<{
   answer: Answer[]
 }>();
+
 ref: avgRate = computed(() => {
   if (props.answer.length == 0) {
     return 0;
@@ -56,6 +59,20 @@ ref: avgRate = computed(() => {
     }
   }, 0);
   return (totalWeightedRate / totalLength).toFixed(3);
+})
+
+ref: successRate = computed(() => {
+  if (props.answer.length == 0) {
+    return 0;
+  }
+  const totalSuccess = props.answer.reduce(function(sum: number, object: Answer) {
+    if (object.url === "Internet Error") {
+      return sum
+    } else {
+      return sum + 1;
+    }
+  }, 0);
+  return (totalSuccess / props.answer.length).toFixed(3);
 })
 </script>
     
