@@ -25,6 +25,14 @@ class Checker:
 
     async def check_words(self, search_text: str) -> Dict[str, str]:
         html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}", self.session)
+        
+        counter = 0
+        while "百度安全验证" in html: # try again
+            counter += 1
+            if counter >= 2: # give up
+                return {"words": search_text, "url": "Internet Error", "rate": "0.00"}
+            html = await self.get_html(f"http://www.baidu.com/s?wd={search_text}", self.session)
+
         et_html = etree.HTML(html)
         urls = et_html.xpath('//*[@id]/h3/a/@href')
         match_texts = {}  # word pieces: url
@@ -77,6 +85,7 @@ class Checker:
 
     @staticmethod
     async def get_html(url: str, session: aiohttp.ClientSession) -> str:
+        await asyncio.sleep(0.5) # keep requests not frequent
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
             'Accept': 'application/json, text/javascript, */*; q=0.01',

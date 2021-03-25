@@ -13,13 +13,13 @@
     </div>
     <TextWrapper v-if="isError" msg="网络错误，请重试" />
     <TextWrapper v-else-if="isTooLong" :msg="'太长了！目前只支持' + maxLength + '字以下'" />
-    <TextWrapper v-else-if="isSendRequest && !isGetResponse" msg="查重中" />
+    <TextWrapper v-else-if="isSendRequest && !isGetResponse" msg="查重中......请等待" />
     <ResultReport v-else-if="isSendRequest && isGetResponse" :answer="answer" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue"
 import GitHubToken from "./components/GitHubToken.vue"
 import TextWrapper from "./components/TextWrapper.vue"
 import ResultReport from "./components/ResultReport.vue"

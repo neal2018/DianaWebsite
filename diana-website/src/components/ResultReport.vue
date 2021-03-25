@@ -15,14 +15,17 @@
     <tbody>
       <tr v-for="temp in answer">
         <td class="td-words">{{ temp.words }}</td>
+        <td v-if="temp.url === 'Internet Error'" class="td-link">N/A</td>
         <td
+          v-else
           class="td-rate"
           :style="'color:' + (parseFloat(temp.rate) > 0.7 ? 'red' : 'black') + ';'"
         >{{ temp.rate }}</td>
-        <td v-if="temp.url !== 'No Pair'" class="td-link">
+        <td v-if="temp.url === 'No Pair'" class="td-link">无相似链接</td>
+        <td v-else-if="temp.url === 'Internet Error'" class="td-link">网络错误！</td>
+        <td v-else class="td-link">
           <a :href="temp.url" target="_blank">链接地址</a>
         </td>
-        <td v-else class="td-link">无相似链接</td>
       </tr>
     </tbody>
   </table>
@@ -46,7 +49,11 @@ ref: avgRate = computed(() => {
     return sum + parseFloat(object.rate) * object.words.length;
   }, 0);
   const totalLength = props.answer.reduce(function(sum: number, object: Answer) {
-    return sum + object.words.length;
+    if (object.url === "Internet Error") {
+      return sum
+    } else {
+      return sum + object.words.length;
+    }
   }, 0);
   return (totalWeightedRate / totalLength).toFixed(3);
 })
